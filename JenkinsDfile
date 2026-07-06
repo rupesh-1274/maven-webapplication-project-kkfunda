@@ -1,0 +1,91 @@
+pipeline{
+	agent any
+	tools
+	{
+		maven "maven-3.9.9"
+	}
+	stages{
+
+		stage('Git checkout'){
+
+		    steps{
+		    	git branch: 'development', url: 'https://github.com/rupesh-1274/maven-webapplication-project-kkfunda.git'
+		    }
+		}
+		stage('Maven Build')
+		{
+			steps
+			{
+				sh "mvn clean package"
+			}
+		}
+		stage('Sonarqube Report')
+		{
+			steps
+			{
+				sh "mvn sonar:sonar"
+			}
+		}
+		stage('Upload artifact')
+		{
+			steps
+			{
+				sh 'mvn deploy'
+			}
+		}
+		stage('Deploy to Tomcat')
+		{
+			steps
+			{
+				sh """
+
+      	curl -u kk:password \
+      --upload-file /var/lib/jenkins/workspace/jio-declarativeway-pipeline/target/maven-web-application.war \
+      "http://3.0.17.234:8080/manager/text/deploy?path=/maven-web-application&update=true"
+      
+          
+        """
+			}
+		}
+	}// stages closing
+	
+
+	post {
+  success {
+    			
+    			script
+    			{
+    				notifyBuild(currentBuild.currentResult)
+    			}
+    }
+  failure {
+        script
+    			{
+    				notifyBuild(currentBuild.currentResult)
+    			}
+  }
+}
+
+
+}// pipeline ending
+
+def notifyBuild(String buildStatus = 'STARTED') {
+    buildStatus = buildStatus ?: 'SUCCESS'
+
+    def colorCode
+    def subject = "${buildStatus}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"
+    def summary = "${subject} (${env.BUILD_URL})"
+
+    switch (buildStatus) {
+        case 'STARTED':
+            colorCode = '#FFFF00' // Yellow
+            break
+        case 'SUCCESS':
+            colorCode = '#00FF00' // Green
+            break
+        default:
+            colorCode = '#FF0000' // Red
+    }
+
+    slackSend(color: colorCode, message: summary)
+}
