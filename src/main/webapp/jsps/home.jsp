@@ -46,7 +46,7 @@
 <body>
 
 <header>
-    <h1> Welcome to KK DEVOPS AWS Portal </h1>
+    <h1> Welcome to KK DEVOPS AWS Portal (BATCH SESSION -6) </h1>
     <h3>Training | Development | Consulting | Deployment </h3>
 </header>
 
