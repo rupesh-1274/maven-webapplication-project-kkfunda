@@ -47,7 +47,7 @@
 
 <header>
     <h1> Welcome to KK DEVOPS AWS Portal </h1>
-    <h3>Training | Development | Consulting</h3>
+    <h3>Training | Development | Consulting | Deployment </h3>
 </header>
 
 <div class="container">
